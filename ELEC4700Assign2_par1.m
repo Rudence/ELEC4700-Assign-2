@@ -5,21 +5,31 @@ clear
 clc
 close all
 
-L = 6;
-W = 6;
-V0 = 10;
+% Simulation Parameters 
+L = 4; % Length of the spatial region
+W = 4; % Width or height ofthe spatial region
+V0 = 10; % Initial Voltage applied 
+gnd = -10; % Ground voltage for easier reading of code 
 
+% Matrix Definitions and sizing 
 G = zeros(W*L,W*L)
 B = zeros(W*L,1)
+space = zeros(W,L)
 
-for y = 1:W
-    for x = 1:L
+% Loop used to initialize the matrix G and B to find V vector 
+for x = 1:L
+    for y = 1:W
+        n = (x-1)*W+y
         if(x == 1)
-            B(y,1) = V0
+            B(n,1) = V0
+            space(y,x) = V0
         elseif(x == L)
-            B(y,L) = -V0
+            B(n,1) = gnd
+            space(y,x) = gnd
         else
-            B(y,x) = -V0
+            %B(y,x) = -V0
         end
     end
 end
+
+space
