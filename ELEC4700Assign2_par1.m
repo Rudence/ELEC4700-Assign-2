@@ -6,8 +6,8 @@ clc
 close all
 
 % Simulation Parameters 
-L = 4; % Length of the spatial region
-W = 4; % Width or height ofthe spatial region
+L = 3; % Length of the spatial region
+W = 3; % Width or height ofthe spatial region
 V0 = 10; % Initial Voltage applied 
 gnd = -10; % Ground voltage for easier reading of code 
 
@@ -27,11 +27,30 @@ for x = 1:L
         elseif(x == L)
             B(n,1) = gnd
             space(y,x) = gnd
-            G() = 1
+            G(y,) = 1
         else
             %B(y,x) = -V0
         end
     end
 end
 
-spy(space)
+space
+
+
+
+% Test to see the matrix 
+% clear 
+% clc
+% 
+% B = [10;10;10;0;0;0;0;0;0]
+% G = [1,0,0,0,0,0,0,0,0;
+%     0,1,0,0,0,0,0,0,0;
+%     0,0,1,0,0,0,0,0,0;
+%     1,0,0,-4,1,0,1,0,0;
+%     0,1,0,1,-4,1,0,1,0;
+%     0,0,1,0,1,-4,0,0,1;
+%     0,0,0,0,0,0,1,0,0;
+%     0,0,0,0,0,0,0,1,0;
+%     0,0,0,0,0,0,0,0,1]
+% 
+% V = G\B
