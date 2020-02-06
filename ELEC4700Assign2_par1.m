@@ -23,6 +23,7 @@ for x = 1:L
         if(x == 1)
             B(n,1) = V0
             space(y,x) = V0
+            G() = 1
         elseif(x == L)
             B(n,1) = gnd
             space(y,x) = gnd
@@ -32,4 +33,4 @@ for x = 1:L
     end
 end
 
-space
+spy(space)
