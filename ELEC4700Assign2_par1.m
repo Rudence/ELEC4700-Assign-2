@@ -6,51 +6,411 @@ clc
 close all
 
 % Simulation Parameters 
-L = 3; % Length of the spatial region
-W = 3; % Width or height ofthe spatial region
-V0 = 10; % Initial Voltage applied 
-gnd = -10; % Ground voltage for easier reading of code 
+L = 90; % Length of the spatial region
+W = 60; % Width or height ofthe spatial region
+V0 = 5; % 5 volt supply
+VX1 = V0;
+VXL = 0;
+gnd = 0; % Ground voltage for easier reading of code 
 
 % Matrix Definitions and sizing 
-G = zeros(W*L,W*L)
-B = zeros(W*L,1)
-space = zeros(W,L)
+G = sparse(W*L,W*L); 
+B = zeros(W*L,1);
 
 % Loop used to initialize the matrix G and B to find V vector 
 for x = 1:L
     for y = 1:W
-        n = (x-1)*W+y
-        if(x == 1)
-            B(n,1) = V0
-            space(y,x) = V0
-            G(n,n) = 1
-        elseif(x == L)
-            B(n,1) = gnd
-            space(y,x) = gnd
-            G(n,n) = 1
-        else
-            %B(y,x) = -V0
+        n = (x-1)*W+y; % Used to place correct values in the G matrix
+        nxm = (x-2)*W+y;
+        nxp = (x)*W+y;
+        nym = (x-1)*W+(y-1);
+        nyp = (x-1)*W+(y+1);         
+        if(x == 1) % Case for lower X boundary
+            B(n,1) = VX1;
+            G(n,n) = 1;
+        elseif(x == L) % Case for upper X boundary 
+            B(n,1) = VXL;
+            G(n,n) = 1;
+        else % Case for calculated nodes
+            G(n,n) = -4;
+            G(n,nxm) = 1;
+            G(n,nxp) = 1;
+            G(n,nym) = 1;
+            G(n,nyp) = 1;
+            B(n,1) = 0;
         end
     end
 end
 
-space
+% Solve for the voltages at each node 
+V = G\B; % Using backslash to simplfy code and speed up calculations
+
+% Map the voltage vector to a matrix so that it can be viewed
+for x = 1:L
+    for y = 1:W
+        n = (x-1)*W+y;
+        map(y,x) = V(n,1);
+    end
+end
+
+% Plot the voltage map as a 3D problem
+figure(2) 
+surf(map)
+title('1D Problem')
+xlabel('X Direction')
+ylabel('Y Direction')
+zlabel('Voltage')
+grid on 
+colormap jet
+colorbar 
 
 
 
-% % Test to see the matrix 
-% clear 
-% clc
-% 
-% B = [10;10;10;0;0;0;0;0;0]
-% G = [1,0,0,0,0,0,0,0,0;
-%     0,1,0,0,0,0,0,0,0;
-%     0,0,1,0,0,0,0,0,0;
-%     1,0,0,-4,1,1,1,0,0;
-%     0,1,0,1,-4,1,0,1,0;
-%     0,0,1,1,1,-4,0,0,1;
-%     0,0,0,0,0,0,1,0,0;
-%     0,0,0,0,0,0,0,1,0;
-%     0,0,0,0,0,0,0,0,1]
-% 
-% V = G\B
+%XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+% Second Case: Saddle
+G = sparse(W*L,W*L);
+B = zeros(W*L,1);
+
+VX1 = V0;
+VXL = V0;
+VY1 = 0;
+VYW = 0;
+
+% Loop used to initialize the matrix G and B to find V vector 
+for x = 1:L
+    for y = 1:W
+        n = (x-1)*W+y;
+        nxm = (x-2)*W+y;
+        nxp = (x)*W+y;
+        nym = (x-1)*W+(y-1);
+        nyp = (x-1)*W+(y+1);         
+        if(x == 1 && y ~= 1 && y ~= W)
+            B(n,1) = VX1;
+            G(n,n) = 1;
+        elseif(x == L && y ~= 1 && y ~= W)
+            B(n,1) = VXL;
+            G(n,n) = 1;
+        elseif(y == 1)
+            B(n,1) = VY1;
+            G(n,n) = 1;
+        elseif(y == W)  
+            B(n,1) = VYW;
+            G(n,n) = 1;
+        else % Calculated 
+            G(n,n) = -4;
+            G(n,nxm) = 1;
+            G(n,nxp) = 1;
+            G(n,nym) = 1;
+            G(n,nyp) = 1;
+            B(n,1) = 0;
+        end
+    end
+end
+
+% Solve voltage vector
+V = G\B;
+
+% Mapping the voltage vector to a matrix
+for x = 1:L
+    for y = 1:W
+        n = (x-1)*W+y;
+        map(y,x) = V(n,1);
+    end
+end
+
+% Plotting the voltage map
+figure(3) 
+surf(map)
+title('Saddle Problem')
+xlabel('X Direction')
+ylabel('Y Direction')
+zlabel('Voltage')
+grid on 
+colormap jet
+colorbar 
+
+
+
+%XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+% Analytical Solution 
+a = W; 
+b = L/2;
+n1 = 10;
+n2 = 200;
+num1 = 10; % Sets the number of meshes used
+num2 = 100; % Used to create different mesh size and compare
+X1 = linspace(-L/2,L/2,num1);
+Y1 = linspace(0,W,num1);
+[nx1,ny1] = meshgrid(X1,Y1);
+X2 = linspace(-L/2,L/2,num2);
+Y2 = linspace(0,W,num2);
+[nx2,ny2] = meshgrid(X2,Y2);
+
+% Initialze the Voltage matrices
+V_analytical1 = zeros(num1,num1);% small sum n1, small mesh number num1 
+V_analytical2 = zeros(num1,num1);% large sum n2, small mesh number num1
+V_analytical3 = zeros(num2,num2);% small sum n1, large mesh number num2 
+V_analytical4 = zeros(num2,num2);% large sum n2, large mesh number num2 
+
+% Iterate through the Fourier series and solve analytical solution
+for n = 1:2:n1
+    V_analytical1 = V_analytical1 + (1/n).*(cosh((n*pi.*nx1)./(a))./cosh((n*pi*(b))/(a))).*sin((n*pi.*ny1)./(a));
+end 
+for n = 1:2:n2
+    V_analytical2 = V_analytical2 + (1/n).*(cosh((n*pi.*nx1)./(a))./cosh((n*pi*(b))/(a))).*sin((n*pi.*ny1)./(a));
+end  
+for n = 1:2:n1
+    V_analytical3 = V_analytical3 + (1/n).*(cosh((n*pi.*nx2)./(a))./cosh((n*pi*(b))/(a))).*sin((n*pi.*ny2)./(a));
+end  
+for n = 1:2:n2
+    V_analytical4 = V_analytical4 + (1/n).*(cosh((n*pi.*nx2)./(a))./cosh((n*pi*(b))/(a))).*sin((n*pi.*ny2)./(a));
+end  
+
+% Multiply by the coefficient 
+V_analytical1 = (4*V0/pi).*V_analytical1;
+V_analytical2 = (4*V0/pi).*V_analytical2;
+V_analytical3 = (4*V0/pi).*V_analytical3;
+V_analytical4 = (4*V0/pi).*V_analytical4;
+
+% Plot all of the analytical solutions on a single plot
+figure(4)
+subplot(2,2,1)
+surf(V_analytical1)
+title('Analytical Solution: Large Mesh, Small Sum')
+xlabel('X Direction')
+ylabel('Y Direction')
+zlabel('Voltage')
+colorbar
+grid on
+
+subplot(2,2,2)
+surf(V_analytical2)
+title('Analytical Solution: Large Mesh, Large Sum')
+xlabel('X Direction')
+ylabel('Y Direction')
+zlabel('Voltage')
+colorbar
+grid on
+
+subplot(2,2,3)
+surf(V_analytical3)
+title('Analytical Solution: Small Mesh, Small Sum')
+xlabel('X Direction')
+ylabel('Y Direction')
+zlabel('Voltage')
+colorbar
+grid on
+
+subplot(2,2,4)
+surf(V_analytical4)
+title('Analytical Solution: Small Mesh Large Sum')
+xlabel('X Direction')
+ylabel('Y Direction')
+zlabel('Voltage')
+colorbar
+grid on
+
+
+
+%XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+%XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+%XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+% Part 2 Resistor and Current Density 
+G = sparse(W*L,W*L); 
+B = zeros(W*L,1);
+conductionTypeA = 1;
+conductionTypeB = 0.01;
+conduction = conductionTypeA.*ones(W,L);
+
+% Defining the boundaries for the bottleneck
+XUpperBound = 0.75*L;
+XLowerBound = 0.25*L;
+YUpperBound = 0.6*W;
+YLowerBound = 0.4*W;
+
+% Sets all of the bottleneck conduction values 
+for x = 1:L
+    for y = 1:W
+        if((x <= XUpperBound && x >= XLowerBound && y <= YLowerBound) || (x <= XUpperBound && x >= XLowerBound && y >= YUpperBound))
+            conduction(y,x) = conductionTypeB;
+        end
+    end
+end
+
+% Set the voltages at the edge cases
+VX1 = V0;
+VXL = 0;
+VY1 = 0;
+VYW = 0;
+
+% Loop used to initialize the matrix G and B to find V vector 
+for x = 1:L
+    for y = 1:W
+        n = (x-1)*W+y; 
+        nxm = (x-2)*W+y;
+        nxp = (x)*W+y;
+        nym = (x-1)*W+(y-1);
+        nyp = (x-1)*W+(y+1);         
+        if(x == 1)
+            B(n,1) = VX1;
+            space(y,x) = VX1;
+            G(n,n) = 1;
+        elseif(x == L)
+            B(n,1) = VXL;
+            space(y,x) = VXL;
+            G(n,n) = 1;
+%             % Top Left Condition
+%         elseif(y == 1 && x == 1)
+%             cxp = (conduction(y,x) + conduction(y,x+1))/2;
+%             cyp = (conduction(y,x) + conduction(y+1,x))/2;
+%             
+%             G(n,n) = -(cxp+cyp);
+%             G(n,nxp) = cxp;
+%             G(n,nyp) = cyp;
+%             
+%             B(n,1) = VX1;
+%             space(y,x) = VX1;
+%             %G(n,n) = 1;
+%             % Top Right Condition
+%         elseif(y == 1 && x == L)
+%             cxm = (conduction(y,x) + conduction(y,x-1))/2;
+%             cyp = (conduction(y,x) + conduction(y+1,x))/2;
+%             
+%             G(n,n) = -(cxm+cyp);
+%             G(n,nxm) = cxm;
+%             G(n,nyp) = cyp;
+%             
+%             B(n,1) = VXL;
+%             space(y,x) = VXL;
+%             %G(n,n) = 1;
+%             % Bottom Left Condition
+%         elseif(y == W && x == 1)
+%             cxp = (conduction(y,x) + conduction(y,x+1))/2;
+%             cym = (conduction(y,x) + conduction(y-1,x))/2;
+%             
+%             G(n,n) = -(cxp+cym);
+%             G(n,nxp) = cxp;
+%             G(n,nym) = cym;
+%             
+%             B(n,1) = VX1;
+%             space(y,x) = VX1;
+%             %G(n,n) = 1;
+%             % Bottom Right Condition
+%         elseif(y == W && x == L)
+%             cxm = (conduction(y,x) + conduction(y,x-1))/2;
+%             cym = (conduction(y,x) + conduction(y-1,x))/2;
+%             
+%             G(n,n) = -(cxm+cym);
+%             G(n,nxm) = cxm;
+%             G(n,nym) = cym;
+%             
+%             B(n,1) = VXL;
+%             space(y,x) = VXL;
+%             %G(n,n) = 1;
+        elseif(y == 1)
+            cxm = (conduction(y,x) + conduction(y,x-1))/2;
+            cxp = (conduction(y,x) + conduction(y,x+1))/2;
+            cyp = (conduction(y,x) + conduction(y+1,x))/2;
+            
+            G(n,n) = -(cxm+cxp+cyp);
+            G(n,nxm) = cxm;
+            G(n,nxp) = cxp;
+            G(n,nyp) = cyp;
+            
+            B(n,1) = VY1;
+            space(y,x) = VY1;
+            %G(n,n) = 1;
+        elseif(y == W)  
+            cxm = (conduction(y,x) + conduction(y,x-1))/2;
+            cxp = (conduction(y,x) + conduction(y,x+1))/2;
+            cym = (conduction(y,x) + conduction(y-1,x))/2;
+            
+            G(n,n) = -(cxm+cxp+cym);
+            G(n,nxm) = cxm;
+            G(n,nxp) = cxp;
+            G(n,nym) = cym;
+            
+            B(n,1) = VYW;
+            space(y,x) = VYW;
+            %G(n,n) = 1;
+        else % Calculated 
+            cxm = (conduction(y,x) + conduction(y,x-1))/2;
+            cxp = (conduction(y,x) + conduction(y,x+1))/2;
+            cyp = (conduction(y,x) + conduction(y+1,x))/2;
+            cym = (conduction(y,x) + conduction(y-1,x))/2;
+            
+            G(n,n) = -(cxm+cxp+cym+cyp);
+            G(n,nxm) = cxm;
+            G(n,nxp) = cxp;
+            G(n,nym) = cym;
+            G(n,nyp) = cyp;
+            B(n,1) = 0;
+        end
+    end
+end
+
+% solve for the voltage vector
+V = G\B;
+
+% Loop to map answer vector to a matrix to be plotted
+for x = 1:L
+    for y = 1:W
+        n = (x-1)*W+y;
+        map(y,x) = V(n,1);
+    end
+end
+
+% Using the gradient function to determine the electric field 
+[Ex,Ey] = gradient(map);
+
+% Plotting the conduction
+figure(5)
+surf(conduction)
+title('Conduction Value')
+xlabel('X Direction')
+ylabel('Y Direction')
+zlabel('Conduction Value')
+colorbar
+grid on 
+
+% Plotting the voltage 
+figure(6) 
+surf(map)
+title('Voltage Over Varying Conduction')
+xlabel('X Direction')
+ylabel('Y Direction')
+zlabel('Voltage')
+grid on 
+colormap jet
+colorbar
+
+% Plotting the electric field 
+figure(7) 
+quiver(-Ex,-Ey,'b')
+title('Electric Field')
+xlabel('X Direction')
+ylabel('Y Direction')
+grid on 
+
+% Calculating the current density using Ohm's Law
+Jx = conduction.*(-Ex);
+Jy = conduction.*(-Ey);
+
+% Plotting the current density 
+figure(8)
+quiver(Jx,Jy,'r')
+title('Current Density')
+xlabel('X Direction')
+ylabel('Y Direction')
+grid on 
+
+
+
+
+
+
+
+
+
+
+
