@@ -573,13 +573,13 @@ for N = 1:N
 end
 
 figure(9)
-plot(1:N,CurrentDensity,'bo')
+plot(1:N,CurrentDensity,'k')
 title('Current Density Versus Mesh Number')
 xlabel('Mesh Number')
 ylabel('Average Current Density On Plate')
 grid on
 
-% Calculating the current density versus bottlneck width
+% Calculating the current density versus bottlenck width
 clear
 N = 50;
 CurrnetDensity = [];
@@ -741,7 +741,7 @@ for N = 1:N
 end
 
 figure(10)
-plot(1:N,CurrentDensity,'bo')
+plot(1:N,CurrentDensity,'k')
 title('Current Density Versus Bottleneck Size')
 xlabel('Bottleneck Width')
 ylabel('Average Current Density On Plate')
@@ -760,7 +760,7 @@ for N = 1:N
     G = sparse(W*L,W*L); 
     B = zeros(W*L,1);
     conductionTypeA = 1;
-    conductionTypeB = 1.02-N*0.02;
+    conductionTypeB = 1-N*0.001;
     conduction = conductionTypeA.*ones(W,L);
 
     % Defining the boundaries for the bottleneck
@@ -860,12 +860,7 @@ for N = 1:N
     CurrentDensity(N) = mean(mean((((Jx.^2)+(Jy.^2)).^0.5)));
 end
 
-figure(11)
-plot(1:N,CurrentDensity,'bo')
-title('Current Density Versus Conductance')
-xlabel('Conducatance')
-ylabel('Average Current Density On Plate')
-grid on
+
 
 
 
