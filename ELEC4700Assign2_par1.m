@@ -253,60 +253,10 @@ for x = 1:L
         nyp = (x-1)*W+(y+1);         
         if(x == 1)
             B(n,1) = VX1;
-            space(y,x) = VX1;
             G(n,n) = 1;
         elseif(x == L)
             B(n,1) = VXL;
-            space(y,x) = VXL;
             G(n,n) = 1;
-%             % Top Left Condition
-%         elseif(y == 1 && x == 1)
-%             cxp = (conduction(y,x) + conduction(y,x+1))/2;
-%             cyp = (conduction(y,x) + conduction(y+1,x))/2;
-%             
-%             G(n,n) = -(cxp+cyp);
-%             G(n,nxp) = cxp;
-%             G(n,nyp) = cyp;
-%             
-%             B(n,1) = VX1;
-%             space(y,x) = VX1;
-%             %G(n,n) = 1;
-%             % Top Right Condition
-%         elseif(y == 1 && x == L)
-%             cxm = (conduction(y,x) + conduction(y,x-1))/2;
-%             cyp = (conduction(y,x) + conduction(y+1,x))/2;
-%             
-%             G(n,n) = -(cxm+cyp);
-%             G(n,nxm) = cxm;
-%             G(n,nyp) = cyp;
-%             
-%             B(n,1) = VXL;
-%             space(y,x) = VXL;
-%             %G(n,n) = 1;
-%             % Bottom Left Condition
-%         elseif(y == W && x == 1)
-%             cxp = (conduction(y,x) + conduction(y,x+1))/2;
-%             cym = (conduction(y,x) + conduction(y-1,x))/2;
-%             
-%             G(n,n) = -(cxp+cym);
-%             G(n,nxp) = cxp;
-%             G(n,nym) = cym;
-%             
-%             B(n,1) = VX1;
-%             space(y,x) = VX1;
-%             %G(n,n) = 1;
-%             % Bottom Right Condition
-%         elseif(y == W && x == L)
-%             cxm = (conduction(y,x) + conduction(y,x-1))/2;
-%             cym = (conduction(y,x) + conduction(y-1,x))/2;
-%             
-%             G(n,n) = -(cxm+cym);
-%             G(n,nxm) = cxm;
-%             G(n,nym) = cym;
-%             
-%             B(n,1) = VXL;
-%             space(y,x) = VXL;
-%             %G(n,n) = 1;
         elseif(y == 1)
             cxm = (conduction(y,x) + conduction(y,x-1))/2;
             cxp = (conduction(y,x) + conduction(y,x+1))/2;
@@ -318,8 +268,6 @@ for x = 1:L
             G(n,nyp) = cyp;
             
             B(n,1) = VY1;
-            space(y,x) = VY1;
-            %G(n,n) = 1;
         elseif(y == W)  
             cxm = (conduction(y,x) + conduction(y,x-1))/2;
             cxp = (conduction(y,x) + conduction(y,x+1))/2;
@@ -329,10 +277,8 @@ for x = 1:L
             G(n,nxm) = cxm;
             G(n,nxp) = cxp;
             G(n,nym) = cym;
-            
+       
             B(n,1) = VYW;
-            space(y,x) = VYW;
-            %G(n,n) = 1;
         else % Calculated 
             cxm = (conduction(y,x) + conduction(y,x-1))/2;
             cxp = (conduction(y,x) + conduction(y,x+1))/2;
@@ -414,7 +360,7 @@ clear
 N = 50;
 L = 3;
 W = 2;
-CurrnetDensity = [];
+CurrentDensity = [];
 for N = 1:N
     % Using a very small mesh will result in odd current so the mesh size
     % is set to a minimum size of 15:10
@@ -458,60 +404,10 @@ for N = 1:N
             nyp = (x-1)*W+(y+1);         
             if(x == 1)
                 B(n,1) = VX1;
-                space(y,x) = VX1;
                 G(n,n) = 1;
             elseif(x == L)
                 B(n,1) = VXL;
-                space(y,x) = VXL;
                 G(n,n) = 1;
-    %             % Top Left Condition
-    %         elseif(y == 1 && x == 1)
-    %             cxp = (conduction(y,x) + conduction(y,x+1))/2;
-    %             cyp = (conduction(y,x) + conduction(y+1,x))/2;
-    %             
-    %             G(n,n) = -(cxp+cyp);
-    %             G(n,nxp) = cxp;
-    %             G(n,nyp) = cyp;
-    %             
-    %             B(n,1) = VX1;
-    %             space(y,x) = VX1;
-    %             %G(n,n) = 1;
-    %             % Top Right Condition
-    %         elseif(y == 1 && x == L)
-    %             cxm = (conduction(y,x) + conduction(y,x-1))/2;
-    %             cyp = (conduction(y,x) + conduction(y+1,x))/2;
-    %             
-    %             G(n,n) = -(cxm+cyp);
-    %             G(n,nxm) = cxm;
-    %             G(n,nyp) = cyp;
-    %             
-    %             B(n,1) = VXL;
-    %             space(y,x) = VXL;
-    %             %G(n,n) = 1;
-    %             % Bottom Left Condition
-    %         elseif(y == W && x == 1)
-    %             cxp = (conduction(y,x) + conduction(y,x+1))/2;
-    %             cym = (conduction(y,x) + conduction(y-1,x))/2;
-    %             
-    %             G(n,n) = -(cxp+cym);
-    %             G(n,nxp) = cxp;
-    %             G(n,nym) = cym;
-    %             
-    %             B(n,1) = VX1;
-    %             space(y,x) = VX1;
-    %             %G(n,n) = 1;
-    %             % Bottom Right Condition
-    %         elseif(y == W && x == L)
-    %             cxm = (conduction(y,x) + conduction(y,x-1))/2;
-    %             cym = (conduction(y,x) + conduction(y-1,x))/2;
-    %             
-    %             G(n,n) = -(cxm+cym);
-    %             G(n,nxm) = cxm;
-    %             G(n,nym) = cym;
-    %             
-    %             B(n,1) = VXL;
-    %             space(y,x) = VXL;
-    %             %G(n,n) = 1;
             elseif(y == 1)
                 cxm = (conduction(y,x) + conduction(y,x-1))/2;
                 cxp = (conduction(y,x) + conduction(y,x+1))/2;
@@ -523,8 +419,6 @@ for N = 1:N
                 G(n,nyp) = cyp;
 
                 B(n,1) = VY1;
-                space(y,x) = VY1;
-                %G(n,n) = 1;
             elseif(y == W)  
                 cxm = (conduction(y,x) + conduction(y,x-1))/2;
                 cxp = (conduction(y,x) + conduction(y,x+1))/2;
@@ -536,8 +430,6 @@ for N = 1:N
                 G(n,nym) = cym;
 
                 B(n,1) = VYW;
-                space(y,x) = VYW;
-                %G(n,n) = 1;
             else % Calculated 
                 cxm = (conduction(y,x) + conduction(y,x-1))/2;
                 cxp = (conduction(y,x) + conduction(y,x+1))/2;
@@ -572,6 +464,7 @@ for N = 1:N
     CurrentDensity(N) = mean(mean((((Jx.^2)+(Jy.^2)).^0.5)));
 end
 
+% Plot the current density versus the mesh size 
 figure(9)
 plot(1:N,CurrentDensity,'bo')
 title('Current Density Versus Mesh Number')
@@ -582,7 +475,7 @@ grid on
 % Calculating the current density versus bottlneck width
 clear
 N = 50;
-CurrnetDensity = [];
+CurrentDensity = [];
 for N = 1:N
     % Using a very small mesh will result in odd current so the mesh size
     % is set to a minimum size of 15:10
@@ -626,60 +519,10 @@ for N = 1:N
             nyp = (x-1)*W+(y+1);         
             if(x == 1)
                 B(n,1) = VX1;
-                space(y,x) = VX1;
                 G(n,n) = 1;
             elseif(x == L)
                 B(n,1) = VXL;
-                space(y,x) = VXL;
                 G(n,n) = 1;
-    %             % Top Left Condition
-    %         elseif(y == 1 && x == 1)
-    %             cxp = (conduction(y,x) + conduction(y,x+1))/2;
-    %             cyp = (conduction(y,x) + conduction(y+1,x))/2;
-    %             
-    %             G(n,n) = -(cxp+cyp);
-    %             G(n,nxp) = cxp;
-    %             G(n,nyp) = cyp;
-    %             
-    %             B(n,1) = VX1;
-    %             space(y,x) = VX1;
-    %             %G(n,n) = 1;
-    %             % Top Right Condition
-    %         elseif(y == 1 && x == L)
-    %             cxm = (conduction(y,x) + conduction(y,x-1))/2;
-    %             cyp = (conduction(y,x) + conduction(y+1,x))/2;
-    %             
-    %             G(n,n) = -(cxm+cyp);
-    %             G(n,nxm) = cxm;
-    %             G(n,nyp) = cyp;
-    %             
-    %             B(n,1) = VXL;
-    %             space(y,x) = VXL;
-    %             %G(n,n) = 1;
-    %             % Bottom Left Condition
-    %         elseif(y == W && x == 1)
-    %             cxp = (conduction(y,x) + conduction(y,x+1))/2;
-    %             cym = (conduction(y,x) + conduction(y-1,x))/2;
-    %             
-    %             G(n,n) = -(cxp+cym);
-    %             G(n,nxp) = cxp;
-    %             G(n,nym) = cym;
-    %             
-    %             B(n,1) = VX1;
-    %             space(y,x) = VX1;
-    %             %G(n,n) = 1;
-    %             % Bottom Right Condition
-    %         elseif(y == W && x == L)
-    %             cxm = (conduction(y,x) + conduction(y,x-1))/2;
-    %             cym = (conduction(y,x) + conduction(y-1,x))/2;
-    %             
-    %             G(n,n) = -(cxm+cym);
-    %             G(n,nxm) = cxm;
-    %             G(n,nym) = cym;
-    %             
-    %             B(n,1) = VXL;
-    %             space(y,x) = VXL;
-    %             %G(n,n) = 1;
             elseif(y == 1)
                 cxm = (conduction(y,x) + conduction(y,x-1))/2;
                 cxp = (conduction(y,x) + conduction(y,x+1))/2;
@@ -691,8 +534,6 @@ for N = 1:N
                 G(n,nyp) = cyp;
 
                 B(n,1) = VY1;
-                space(y,x) = VY1;
-                %G(n,n) = 1;
             elseif(y == W)  
                 cxm = (conduction(y,x) + conduction(y,x-1))/2;
                 cxp = (conduction(y,x) + conduction(y,x+1))/2;
@@ -704,8 +545,6 @@ for N = 1:N
                 G(n,nym) = cym;
 
                 B(n,1) = VYW;
-                space(y,x) = VYW;
-                %G(n,n) = 1;
             else % Calculated 
                 cxm = (conduction(y,x) + conduction(y,x-1))/2;
                 cxp = (conduction(y,x) + conduction(y,x+1))/2;
@@ -740,6 +579,7 @@ for N = 1:N
     CurrentDensity(N) = mean(mean((((Jx.^2)+(Jy.^2)).^0.5)));
 end
 
+% Plot the current density of the bottlneck difference
 figure(10)
 plot(1:N,CurrentDensity,'bo')
 title('Current Density Versus Bottleneck Size')
@@ -750,7 +590,7 @@ grid on
 % Calculating the current density versus the conductance in 
 clear
 N = 50;
-CurrnetDensity = [];
+CurrentDensity = [];
 for N = 1:N
     % Using a very small mesh will result in odd current so the mesh size
     % is set to a minimum size of 15:10
@@ -794,11 +634,9 @@ for N = 1:N
             nyp = (x-1)*W+(y+1);         
             if(x == 1)
                 B(n,1) = VX1;
-                space(y,x) = VX1;
                 G(n,n) = 1;
             elseif(x == L)
                 B(n,1) = VXL;
-                space(y,x) = VXL;
                 G(n,n) = 1;
             elseif(y == 1)
                 cxm = (conduction(y,x) + conduction(y,x-1))/2;
@@ -811,8 +649,6 @@ for N = 1:N
                 G(n,nyp) = cyp;
 
                 B(n,1) = VY1;
-                space(y,x) = VY1;
-                %G(n,n) = 1;
             elseif(y == W)  
                 cxm = (conduction(y,x) + conduction(y,x-1))/2;
                 cxp = (conduction(y,x) + conduction(y,x+1))/2;
@@ -824,8 +660,6 @@ for N = 1:N
                 G(n,nym) = cym;
 
                 B(n,1) = VYW;
-                space(y,x) = VYW;
-                %G(n,n) = 1;
             else % Calculated 
                 cxm = (conduction(y,x) + conduction(y,x-1))/2;
                 cxp = (conduction(y,x) + conduction(y,x+1))/2;
@@ -860,6 +694,7 @@ for N = 1:N
     CurrentDensity(N) = mean(mean((((Jx.^2)+(Jy.^2)).^0.5)));
 end
 
+% Plotting the current density for varying conductance
 figure(11)
 plot(1:N,CurrentDensity,'bo')
 title('Current Density Versus Conductance')
